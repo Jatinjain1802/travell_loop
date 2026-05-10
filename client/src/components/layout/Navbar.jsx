@@ -23,11 +23,17 @@ export default function Navbar() {
 
         <nav className="flex items-center gap-6">
           <div className="hidden md:flex items-center gap-6 mr-4">
+            <Link to="/search" className="text-sm font-medium hover:text-primary transition-colors">
+              Search
+            </Link>
             <Link to="/trips" className="text-sm font-medium hover:text-primary transition-colors">
               My Trips
             </Link>
             <Link to="/community" className="text-sm font-medium hover:text-primary transition-colors">
               Community
+            </Link>
+            <Link to="/admin" className="text-sm font-medium hover:text-primary transition-colors">
+              Admin
             </Link>
           </div>
           

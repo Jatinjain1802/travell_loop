@@ -8,6 +8,12 @@ import CreateTripPage from '@/features/trips/CreateTripPage';
 import BuildItineraryPage from '@/features/trips/BuildItineraryPage';
 import ItineraryViewPage from '@/features/trips/ItineraryViewPage';
 import SearchPage from '@/features/search/SearchPage';
+import ProfilePage from '@/features/profile/ProfilePage';
+import CommunityPage from '@/features/community/CommunityPage';
+import AdminPage from '@/features/admin/AdminPage';
+import ChecklistPage from '@/features/checklist/ChecklistPage';
+import NotesPage from '@/features/notes/NotesPage';
+import InvoicePage from '@/features/invoice/InvoicePage';
 
 function App() {
   return (
@@ -24,8 +30,13 @@ function App() {
           <Route path="trips/create" element={<CreateTripPage />} />
           <Route path="trips/:id" element={<ItineraryViewPage />} />
           <Route path="trips/:id/build" element={<BuildItineraryPage />} />
+          <Route path="trips/:id/checklist" element={<ChecklistPage />} />
+          <Route path="trips/:id/notes" element={<NotesPage />} />
+          <Route path="trips/:id/invoice" element={<InvoicePage />} />
           <Route path="search" element={<SearchPage />} />
-          {/* Add more routes here as we build them */}
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="community" element={<CommunityPage />} />
+          <Route path="admin" element={<AdminPage />} />
         </Route>
       </Routes>
     </Router>
