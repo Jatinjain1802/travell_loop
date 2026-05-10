@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Github, Chrome } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Code, Globe } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Button, Card, Input } from '@/components/common/UI';
 
@@ -104,11 +104,11 @@ export default function LoginPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" className="h-14 border-slate-200 text-secondary hover:bg-slate-50">
-                <Github className="h-5 w-5" />
+                <Code className="h-5 w-5" />
                 Github
               </Button>
               <Button variant="outline" className="h-14 border-slate-200 text-secondary hover:bg-slate-50">
-                <Chrome className="h-5 w-5" />
+                <Globe className="h-5 w-5" />
                 Google
               </Button>
             </div>

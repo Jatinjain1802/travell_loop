@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { PlaneTakeoff, User, LogOut, Search, Compass, ShieldCheck, Menu } from 'lucide-react';
+import { Plane, User, LogOut, Search, Compass, ShieldCheck, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { cn, Button } from '@/components/common/UI';
 
