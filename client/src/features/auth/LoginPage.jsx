@@ -13,16 +13,21 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, loading } = useAuthStore();
+  const { login, loading, error: storeError } = useAuthStore();
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data) => {
-    const success = await login(data);
-    if (success) navigate('/trips');
+    try {
+      await login(data);
+      navigate('/trips');
+    } catch (err) {
+      // Error is handled in store
+    }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 relative overflow-hidden">
@@ -62,7 +67,13 @@ export default function LoginPage() {
             <div className="space-y-3">
               <h2 className="text-3xl font-black text-secondary">Member Login</h2>
               <p className="text-muted font-bold">Enter your credentials to continue your journey.</p>
+              {storeError && (
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl text-destructive text-xs font-black uppercase tracking-widest animate-premium">
+                  {storeError}
+                </div>
+              )}
             </div>
+
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               <div className="space-y-6">

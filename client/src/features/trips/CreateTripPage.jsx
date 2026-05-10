@@ -15,21 +15,23 @@ const tripSchema = z.object({
 
 export default function CreateTripPage() {
   const navigate = useNavigate();
-  const { addTrip } = useTripStore();
+  const { addTrip, loading, error: storeError } = useTripStore();
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(tripSchema),
   });
 
   const onSubmit = async (data) => {
-    const newTrip = {
-      id: Date.now().toString(),
-      ...data,
-      status: 'planned'
-    };
-    addTrip(newTrip);
-    navigate(`/trips/${newTrip.id}`);
+    try {
+      const trip = await addTrip(data);
+      if (trip && trip.id) {
+        navigate(`/trips/${trip.id}`);
+      }
+    } catch (err) {
+      // Error is handled in store
+    }
   };
+
 
   return (
     <div className="max-w-4xl mx-auto py-12 animate-premium">
@@ -41,7 +43,13 @@ export default function CreateTripPage() {
           </div>
           <h1 className="text-6xl font-black text-secondary tracking-tight">Create your next <br /><span className="text-primary italic">Masterpiece.</span></h1>
           <p className="text-slate-400 font-bold max-w-lg mx-auto">Fill in the core details to initialize your travel loop. Our AI engine will help you with the rest.</p>
+          {storeError && (
+            <div className="max-w-md mx-auto p-4 bg-destructive/10 border border-destructive/20 rounded-2xl text-destructive text-xs font-black uppercase tracking-widest animate-premium">
+              {storeError}
+            </div>
+          )}
         </div>
+
 
         <Card className="p-16 shadow-2xl border-none">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">

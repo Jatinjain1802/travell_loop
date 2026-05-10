@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { 
   Plus, Search, MapPin, 
   ChevronRight, Filter, TrendingUp, Sparkles,
@@ -10,7 +10,13 @@ import { Button, Card, cn } from '@/components/common/UI';
 import TripCard from './components/TripCard';
 
 export default function TripListingPage() {
-  const { trips } = useTripStore();
+  const { trips, fetchTrips, loading } = useTripStore();
+  const [activeTab, setActiveTab] = useState('upcoming');
+
+  useEffect(() => {
+    fetchTrips(activeTab);
+  }, [fetchTrips, activeTab]);
+
 
   return (
     <div className="space-y-20 pb-32 animate-in fade-in duration-700">
@@ -61,17 +67,31 @@ export default function TripListingPage() {
           {/* Tabs & Filter */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-100 pb-8 px-2">
             <div className="flex items-center gap-10">
-              <button className="text-sm font-black text-secondary relative group">
+              <button 
+                onClick={() => setActiveTab('upcoming')}
+                className={cn(
+                  "text-sm font-black transition-all relative group",
+                  activeTab === 'upcoming' ? "text-secondary" : "text-slate-400 hover:text-secondary"
+                )}
+              >
                 Upcoming
-                <div className="absolute -bottom-9 left-0 right-0 h-1.5 bg-primary rounded-t-full shadow-glow" />
+                {activeTab === 'upcoming' && <div className="absolute -bottom-9 left-0 right-0 h-1.5 bg-primary rounded-t-full shadow-glow" />}
               </button>
-              <button className="text-sm font-black text-slate-400 hover:text-secondary transition-colors">
+              <button 
+                onClick={() => setActiveTab('completed')}
+                className={cn(
+                  "text-sm font-black transition-all relative group",
+                  activeTab === 'completed' ? "text-secondary" : "text-slate-400 hover:text-secondary"
+                )}
+              >
                 Past
+                {activeTab === 'completed' && <div className="absolute -bottom-9 left-0 right-0 h-1.5 bg-primary rounded-t-full shadow-glow" />}
               </button>
               <button className="text-sm font-black text-slate-400 hover:text-secondary transition-colors">
                 Wishlist
               </button>
             </div>
+
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black uppercase text-slate-300 mr-2">Sort by: Date</span>
               <Button variant="ghost" size="sm" className="bg-slate-50 border border-slate-100 px-4 gap-2 text-slate-500 hover:bg-white hover:shadow-md transition-all">
@@ -83,7 +103,11 @@ export default function TripListingPage() {
 
           {/* Cards Grid */}
           <div className="grid md:grid-cols-2 gap-12">
-            {trips.length > 0 ? (
+            {loading ? (
+              [1, 2, 3, 4].map(i => (
+                <div key={i} className="h-[400px] rounded-[40px] bg-slate-50 animate-pulse border border-slate-100" />
+              ))
+            ) : trips.length > 0 ? (
               trips.map((trip) => (
                 <TripCard key={trip.id} trip={trip} />
               ))
@@ -92,10 +116,11 @@ export default function TripListingPage() {
                 <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Zap className="h-8 w-8 text-slate-200" />
                 </div>
-                <h3 className="text-xl font-black text-secondary">No trips planned yet</h3>
+                <h3 className="text-xl font-black text-secondary">No {activeTab} trips found</h3>
                 <p className="text-slate-400 mt-2 font-bold">Start by creating your first itinerary!</p>
               </div>
             )}
+
 
             {/* Empty State / Create New Card */}
             <Link to="/trips/create" className="h-full min-h-[400px] rounded-[40px] border-4 border-dashed border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-all group flex flex-col items-center justify-center gap-8">

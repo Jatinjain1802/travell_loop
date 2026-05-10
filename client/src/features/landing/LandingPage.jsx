@@ -4,8 +4,12 @@ import {
   Star, Shield, Zap, Heart, Globe, Search 
 } from 'lucide-react';
 import { Button, Card, cn } from '@/components/common/UI';
+import { useAuthStore } from '@/store/authStore';
+
 
 export default function LandingPage() {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <div className="space-y-32 pb-20 overflow-hidden">
       {/* Hero Section */}
@@ -27,16 +31,28 @@ export default function LandingPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-6 animate-premium [animation-delay:200ms]">
+          {isAuthenticated ? (
+            <Link to="/trips">
+              <Button size="xl" className="h-20 px-12 group shadow-xl">
+                Go to Dashboard
+                <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/register">
+              <Button size="xl" className="h-20 px-12 group shadow-xl">
+                Start Planning
+                <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+              </Button>
+            </Link>
+          )}
           <Link to="/search">
-            <Button size="xl" className="h-20 px-12 group shadow-xl">
-              Start Planning
-              <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+            <Button variant="secondary" size="xl" className="h-20 px-12 glass">
+              Explore Destinations
             </Button>
           </Link>
-          <Button variant="secondary" size="xl" className="h-20 px-12 glass">
-            Explore Destinations
-          </Button>
         </div>
+
 
         {/* Floating Logo / Identity */}
         <div className="pt-10 animate-premium [animation-delay:400ms]">

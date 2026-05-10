@@ -15,16 +15,21 @@ const registerSchema = z.object({
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { register: registerUser, loading } = useAuthStore();
+  const { register: registerUser, loading, error: storeError } = useAuthStore();
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data) => {
-    const success = await registerUser(data);
-    if (success) navigate('/trips');
+    try {
+      await registerUser(data);
+      navigate('/trips');
+    } catch (err) {
+      // Handled in store
+    }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 relative overflow-hidden">
@@ -50,7 +55,13 @@ export default function RegisterPage() {
             <div className="space-y-3">
               <h2 className="text-3xl font-black text-secondary">Create Account</h2>
               <p className="text-muted font-bold">Join 50,000+ explorers worldwide.</p>
+              {storeError && (
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl text-destructive text-xs font-black uppercase tracking-widest animate-premium">
+                  {storeError}
+                </div>
+              )}
             </div>
+
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
