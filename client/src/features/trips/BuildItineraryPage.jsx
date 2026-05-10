@@ -1,191 +1,139 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, Search, Clock, Calendar, MapPin, Save, ChevronRight, Info } from 'lucide-react';
-import { useTripStore } from '@/store/tripStore';
-
-const mockActivities = [
-  { id: 1, name: 'Eiffel Tower Visit', category: 'Sightseeing', duration: '2h', location: 'Paris' },
-  { id: 2, name: 'Louvre Museum', category: 'Culture', duration: '3h', location: 'Paris' },
-  { id: 3, name: 'Seine River Cruise', category: 'Leisure', duration: '1h', location: 'Paris' },
-  { id: 4, name: 'Montmartre Walk', category: 'Nature', duration: '2h', location: 'Paris' },
-];
+import { 
+  Plus, Search, MapPin, 
+  Clock, Calendar, Sparkles,
+  Utensils, Map as MapIcon, 
+  TrendingUp, Save, ArrowLeft
+} from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Card, Input, cn } from '@/components/common/UI';
 
 export default function BuildItineraryPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { trips } = useTripStore();
-  const trip = trips.find(t => t.id === id);
-
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [itinerary, setItinerary] = useState([]);
-
-  const handleAddActivity = (activity) => {
-    if (!selectedDate || !selectedTime) {
-      alert('Please select date and time first');
-      return;
-    }
-    setItinerary([...itinerary, { ...activity, date: selectedDate, time: selectedTime }]);
-    setSearchQuery('');
-  };
-
-  const handleSave = () => {
-    console.log('Saving itinerary:', itinerary);
-    navigate(`/trips/${id}`);
-  };
-
-  if (!trip) return <div className="p-10 text-center">Trip not found</div>;
+  const [activeDay, setActiveDay] = useState(1);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 py-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-            <Link to="/trips" className="hover:text-primary">Trips</Link>
-            <ChevronRight className="h-3 w-3" />
-            <span className="font-medium text-foreground">{trip.title}</span>
+    <div className="space-y-12 pb-20 animate-premium">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-100 pb-10">
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate(`/trips/${id}`)}
+            className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary hover:bg-slate-100 transition-all"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="space-y-1 text-left">
+            <h1 className="text-4xl font-black text-secondary tracking-tight">Builder <span className="text-primary">Mode.</span></h1>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Tropical Escape: Bali & Beyond</p>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Build Your Itinerary</h1>
         </div>
-        <button 
-          onClick={handleSave}
-          className="bg-primary text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
-        >
-          <Save className="h-5 w-5" />
-          Complete Itinerary
-        </button>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" className="h-14 px-8 border-slate-200 text-secondary">Discard Changes</Button>
+          <Button className="h-14 px-10 shadow-xl">
+            <Save className="h-5 w-5" />
+            Save masterpiece
+          </Button>
+        </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Step 1 & 2: Time & Date Selection */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-card border rounded-3xl p-6 shadow-sm space-y-6">
-            <h3 className="font-bold flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-[10px]">1</span>
-              Set Time & Date
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Select Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <input 
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border bg-background outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
+      <div className="grid lg:grid-cols-12 gap-12">
+        {/* Planner Sidebar */}
+        <div className="lg:col-span-4 space-y-10">
+          <Card className="p-10 space-y-8 border-none shadow-premium bg-slate-50">
+            <h3 className="text-2xl font-black text-secondary">Add Activity</h3>
+            <div className="space-y-6">
+              <Input label="Activity Name" placeholder="e.g. Visit Rice Fields" icon={Sparkles} />
+              <Input label="Location" placeholder="Ubud, Bali" icon={MapPin} />
+              <div className="grid grid-cols-2 gap-4">
+                <Input label="Start Time" type="time" icon={Clock} />
+                <Input label="Category" placeholder="Food" icon={Utensils} />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Select Time</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <input 
-                    type="time"
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border bg-background outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
+              <Button className="w-full h-16 shadow-lg">
+                <Plus className="h-5 w-5" />
+                Add to Day {activeDay}
+              </Button>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 text-blue-800 text-sm">
-            <Info className="h-5 w-5 shrink-0" />
-            <p>Select a date and time from your trip range, then find an activity to add it to your schedule.</p>
-          </div>
+          <Card className="p-10 space-y-6 bg-secondary text-white border-none shadow-2xl relative overflow-hidden group">
+            <div className="relative z-10 space-y-6">
+              <div className="bg-primary p-3 rounded-xl w-fit shadow-glow">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-black leading-tight">AI Auto-Build</h3>
+              <p className="text-sm font-bold text-white/50 leading-relaxed">
+                Let our AI engine populate Day {activeDay} with top-rated spots based on your travel style.
+              </p>
+              <Button className="w-full h-14 bg-white text-secondary hover:bg-white/90">Generate Schedule</Button>
+            </div>
+            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-primary/10 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000" />
+          </Card>
         </div>
 
-        {/* Step 3: Activity Search & Selection */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-card border rounded-3xl p-6 shadow-sm space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-[10px]">2</span>
-                Find Activities
-              </h3>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <input 
-                  type="text" 
-                  placeholder="Search..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-9 pl-9 pr-4 rounded-lg border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-            </div>
+        {/* Builder Timeline Area */}
+        <div className="lg:col-span-8 space-y-12">
+           <div className="flex items-center gap-4 overflow-x-auto no-scrollbar pb-2">
+             {[1, 2, 3, 4, 5, 6, 7].map(day => (
+               <button 
+                key={day}
+                onClick={() => setActiveDay(day)}
+                className={cn(
+                  "min-w-[100px] h-20 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 border-2",
+                  activeDay === day 
+                    ? "bg-primary border-primary text-white shadow-glow scale-105" 
+                    : "bg-white border-slate-100 text-slate-400 hover:border-primary/20"
+                )}
+               >
+                 <span className="text-[10px] font-black uppercase tracking-widest">Day</span>
+                 <span className="text-2xl font-black leading-none">{day}</span>
+               </button>
+             ))}
+           </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              {mockActivities.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase())).map(activity => (
-                <div key={activity.id} className="border rounded-2xl p-4 hover:border-primary hover:bg-primary/5 transition-all group">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded">
-                      {activity.category}
-                    </span>
-                    <button 
-                      onClick={() => handleAddActivity(activity)}
-                      className="p-1.5 bg-primary text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <h4 className="font-bold text-foreground">{activity.name}</h4>
-                  <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {activity.duration}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {activity.location}
-                    </div>
-                  </div>
+           <div className="space-y-6">
+              <div className="flex items-center justify-between px-2">
+                <h3 className="text-2xl font-black text-secondary">Schedule for Day {activeDay}</h3>
+                <div className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  3 Activities Planned
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Current Itinerary Preview */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-lg">Itinerary Draft</h3>
-            {itinerary.length === 0 ? (
-              <div className="h-32 border-2 border-dashed rounded-3xl flex items-center justify-center text-muted-foreground text-sm">
-                No activities added yet
+              <div className="space-y-4">
+                 <DraggableActivity time="09:00 AM" title="Traditional Breakfast" />
+                 <DraggableActivity time="11:30 AM" title="Monkey Forest Sanctuary" />
+                 <DraggableActivity time="02:30 PM" title="Rice Terrace Trek" />
+                 
+                 <button className="w-full h-32 rounded-3xl border-4 border-dashed border-slate-50 flex flex-col items-center justify-center gap-3 text-slate-300 hover:text-primary hover:border-primary/20 hover:bg-slate-50 transition-all group">
+                    <Plus className="h-8 w-8 transition-transform group-hover:scale-110" />
+                    <span className="text-sm font-black uppercase tracking-[0.2em]">Drop to Add Activity</span>
+                 </button>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {itinerary.map((item, idx) => (
-                  <div key={idx} className="bg-card border rounded-2xl p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-primary/10 text-primary p-3 rounded-xl">
-                        <Calendar className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold">{item.name}</h4>
-                        <p className="text-xs text-muted-foreground">{item.date} at {item.time}</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => setItinerary(itinerary.filter((_, i) => i !== idx))}
-                      className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+           </div>
         </div>
       </div>
     </div>
   );
 }
 
-import { Link } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+function DraggableActivity({ time, title }) {
+  return (
+    <div className="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm flex items-center justify-between hover:shadow-md transition-all cursor-move group">
+      <div className="flex items-center gap-6">
+        <div className="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-primary transition-colors">
+          {time}
+        </div>
+        <h4 className="text-xl font-black text-secondary">{title}</h4>
+      </div>
+      <div className="flex items-center gap-2">
+        <button className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 hover:text-secondary hover:bg-slate-100 transition-all">
+          <MapIcon className="h-4 w-4" />
+        </button>
+        <button className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 hover:text-destructive hover:bg-destructive/5 transition-all">
+          <Plus className="h-4 w-4 rotate-45" />
+        </button>
+      </div>
+    </div>
+  );
+}

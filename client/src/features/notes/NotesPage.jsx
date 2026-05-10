@@ -1,142 +1,135 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
 import { 
-  BookOpen, Plus, Trash2, ChevronLeft, Image as ImageIcon, 
-  Search, MoreVertical, Calendar, MapPin, Tag, Heart
+  Plus, Search, Edit3, 
+  Trash2, Pin, Tag, 
+  Clock, Maximize2, ArrowLeft,
+  FileText, Sparkles
 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Card, Input, cn } from '@/components/common/UI';
 
 export default function NotesPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [notes, setNotes] = useState([
-    { 
-      id: 1, 
-      title: 'First Day in Paris', 
-      content: 'The Eiffel Tower was breathtaking at sunset. We had some amazing croissants near the Seine.', 
-      date: '2024-06-15', 
-      location: 'Trocadéro, Paris',
-      image: 'https://images.unsplash.com/photo-1543349689-9a4d426bee8e?q=80&w=2001',
-      liked: true 
-    },
-    { 
-      id: 2, 
-      title: 'The Louvre Experience', 
-      content: 'Spent the whole morning at the Louvre. Mona Lisa is smaller than I thought but the museum architecture is incredible.', 
-      date: '2024-06-16', 
-      location: 'Louvre Museum',
-      image: 'https://images.unsplash.com/photo-1499856126354-5392d431f008?q=80&w=2070',
-      liked: false 
-    }
+    { id: 1, title: 'Passport Copies', text: 'Scanned copy of main page and visa...', date: '2h ago', category: 'Travel Docs', pinned: true },
+    { id: 2, title: 'Villa Entry Code', text: 'The code is 1245# - Gate near the pool...', date: '5h ago', category: 'Logistics', pinned: false },
+    { id: 3, title: 'Restaurant Wishlist', text: '1. Merah Putih\n2. Sisterfields...', date: '1d ago', category: 'Food', pinned: false },
   ]);
 
-  const [isAdding, setIsAdding] = useState(false);
-
   return (
-    <div className="max-w-5xl mx-auto space-y-8 py-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <Link to={`/trips/${id}`} className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            <ChevronLeft className="h-4 w-4" />
-            Back to Itinerary
-          </Link>
-          <h1 className="text-3xl font-bold tracking-tight">Trip Journal & Notes</h1>
+    <div className="max-w-6xl mx-auto py-12 space-y-12 animate-premium">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-100 pb-10">
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate(`/trips/${id}`)}
+            className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary hover:bg-slate-100 transition-all"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="space-y-1 text-left">
+            <h1 className="text-4xl font-black text-secondary tracking-tight">Travel <span className="text-primary italic">Notes.</span></h1>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Digital Vault for: Tropical Escape</p>
+          </div>
         </div>
-        <button 
-          onClick={() => setIsAdding(true)}
-          className="bg-primary text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-primary/20"
-        >
-          <Plus className="h-5 w-5" />
-          Add Entry
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Search notes..." 
+              className="h-14 pl-12 pr-6 rounded-2xl bg-slate-50 border-none text-sm font-bold focus:ring-4 focus:ring-primary/10 transition-all outline-none w-64"
+            />
+          </div>
+          <Button size="lg" className="h-14 px-8 shadow-xl">
+            <Plus className="h-5 w-5" />
+            Add Note
+          </Button>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Search & Tags Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-card border rounded-3xl p-6 shadow-sm space-y-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search notes..." 
-                className="w-full h-10 pl-10 pr-4 rounded-xl border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Quick Filters</label>
-              <div className="flex flex-wrap gap-2">
-                {['All', 'Favorites', 'Recent', 'With Photos'].map(tag => (
-                  <button key={tag} className="px-3 py-1.5 rounded-lg border text-xs font-medium hover:bg-muted transition-colors">
-                    {tag}
-                  </button>
-                ))}
-              </div>
+      <div className="grid lg:grid-cols-4 gap-12">
+        {/* Categories Sidebar */}
+        <div className="space-y-10">
+          <div className="space-y-6">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Categories</h3>
+            <div className="space-y-2">
+              {['All Notes', 'Travel Docs', 'Logistics', 'Food', 'Drafts'].map(cat => (
+                <button key={cat} className={cn(
+                  "flex items-center justify-between w-full p-4 rounded-2xl text-sm font-bold transition-all",
+                  cat === 'All Notes' ? "bg-secondary text-white shadow-xl" : "text-slate-400 hover:bg-slate-50 hover:text-secondary"
+                )}>
+                  {cat}
+                  <span className="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded-lg group-hover:bg-primary/20">12</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-indigo-600 to-primary rounded-3xl p-6 text-white space-y-4 shadow-xl">
-            <BookOpen className="h-8 w-8 text-white/50" />
-            <h3 className="font-bold text-lg leading-tight">Preserve your travel memories forever</h3>
-            <p className="text-sm text-white/70">Capture thoughts, feelings, and the little details that make every trip unique.</p>
-          </div>
+          <Card className="p-8 bg-primary/10 border-none space-y-6">
+            <div className="bg-primary p-3 rounded-xl w-fit shadow-glow">
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-xl font-black text-secondary leading-tight">AI Note Summary</h4>
+              <p className="text-sm font-bold text-slate-500 leading-relaxed">
+                We've organized your villa entry codes and flight details into a quick-access dashboard.
+              </p>
+            </div>
+            <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/5">View Dashboard</Button>
+          </Card>
         </div>
 
         {/* Notes Grid */}
-        <div className="md:col-span-2 space-y-6">
-          {notes.map((note) => (
-            <div key={note.id} className="group bg-card border rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300">
-              <div className="grid md:grid-cols-5 h-full">
-                <div className="md:col-span-2 relative overflow-hidden h-48 md:h-full">
-                  <img src={note.image} alt={note.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute top-4 left-4">
-                    <button className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-colors">
-                      <Heart className={`h-4 w-4 ${note.liked ? 'fill-red-500 text-red-500' : ''}`} />
-                    </button>
-                  </div>
-                </div>
-                <div className="md:col-span-3 p-6 flex flex-col justify-between space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary">
-                        <Calendar className="h-3 w-3" />
-                        {note.date}
+        <div className="lg:col-span-3">
+          <div className="grid md:grid-cols-2 gap-8">
+            {notes.map(note => (
+              <Card key={note.id} padding="none" className="group overflow-hidden border-none shadow-premium hover:shadow-2xl">
+                 <div className="p-8 space-y-6 text-left">
+                    <div className="flex justify-between items-start">
+                      <div className="bg-slate-50 p-3 rounded-2xl">
+                        <FileText className="h-6 w-6 text-primary" />
                       </div>
-                      <button className="p-1 hover:bg-muted rounded-lg transition-colors">
-                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {note.pinned && <Pin className="h-4 w-4 text-primary fill-primary" />}
+                        <button className="p-2 text-slate-200 hover:text-secondary transition-colors"><MoreVertical className="h-5 w-5" /></button>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold group-hover:text-primary transition-colors">{note.title}</h3>
-                    <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">
-                      {note.content}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-dashed">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {note.location}
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-black text-secondary group-hover:text-primary transition-colors">{note.title}</h3>
+                      <p className="text-sm font-bold text-slate-400 leading-relaxed line-clamp-3">{note.text}</p>
                     </div>
-                    <button className="text-primary font-bold text-xs hover:underline flex items-center gap-1">
-                      Read full entry
-                      <ChevronLeft className="h-3 w-3 rotate-180" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
 
-          {notes.length === 0 && (
-            <div className="py-32 text-center border-2 border-dashed rounded-[40px] space-y-4">
-              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="h-10 w-10 text-muted-foreground" />
-              </div>
-              <h3 className="text-xl font-bold">Your journal is empty</h3>
-              <p className="text-muted-foreground">Start writing your first entry to capture the magic.</p>
-              <button className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold mt-4 shadow-lg shadow-primary/20">
-                Write a Note
-              </button>
-            </div>
-          )}
+                    <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                       <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
+                          <Clock className="h-3.5 w-3.5" />
+                          {note.date}
+                       </div>
+                       <div className="flex items-center gap-2">
+                          <Button size="sm" variant="ghost" className="h-10 w-10 p-0 text-slate-300 hover:text-secondary">
+                             <Edit3 className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-10 w-10 p-0 text-slate-300 hover:text-destructive">
+                             <Trash2 className="h-4 w-4" />
+                          </Button>
+                       </div>
+                    </div>
+                 </div>
+              </Card>
+            ))}
+
+            <button className="h-[340px] rounded-[32px] border-4 border-dashed border-slate-100 hover:border-primary/20 hover:bg-primary/5 transition-all group flex flex-col items-center justify-center gap-4">
+               <div className="h-16 w-16 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-500">
+                  <Plus className="h-8 w-8 text-primary group-hover:text-white transition-colors" />
+               </div>
+               <div className="text-center">
+                  <p className="text-lg font-black text-secondary">New Masterpiece</p>
+                  <p className="text-sm font-bold text-slate-400">Write something fresh</p>
+               </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

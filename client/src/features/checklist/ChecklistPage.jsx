@@ -1,162 +1,132 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
 import { 
-  CheckSquare, Square, Plus, Trash2, ChevronLeft, 
-  Filter, Package, Briefcase, Camera, HeartPulse 
+  CheckSquare, Square, Plus, 
+  Trash2, Filter, ShieldCheck, 
+  Tag, Info, MoreVertical, ArrowLeft
 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Card, Input, cn } from '@/components/common/UI';
 
 export default function ChecklistPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [items, setItems] = useState([
-    { id: 1, text: 'Passport and Visa', category: 'Documents', checked: true },
-    { id: 2, text: 'Travel Insurance', category: 'Documents', checked: false },
-    { id: 3, text: 'Hiking Boots', category: 'Clothing', checked: true },
-    { id: 4, text: 'Power Bank', category: 'Electronics', checked: false },
-    { id: 5, text: 'Sunscreen', category: 'Essentials', checked: false },
+    { id: 1, text: 'Renew Passport', category: 'Documentation', completed: true },
+    { id: 2, text: 'Buy Travel Insurance', category: 'Documentation', completed: false },
+    { id: 3, text: 'Pack Universal Adapter', category: 'Gear', completed: false },
+    { id: 4, text: 'Confirm Hotel Bookings', category: 'Bookings', completed: true },
   ]);
 
-  const [newItem, setNewItem] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  const toggleItem = (itemId) => {
+  const toggleItem = (id) => {
     setItems(items.map(item => 
-      item.id === itemId ? { ...item, checked: !item.checked } : item
+      item.id === id ? { ...item, completed: !item.completed } : item
     ));
   };
 
-  const addItem = (e) => {
-    e.preventDefault();
-    if (!newItem.trim()) return;
-    setItems([...items, { 
-      id: Date.now(), 
-      text: newItem, 
-      category: 'Essentials', 
-      checked: false 
-    }]);
-    setNewItem('');
-  };
-
-  const deleteItem = (itemId) => {
-    setItems(items.filter(item => item.id !== itemId));
-  };
-
-  const progress = Math.round((items.filter(i => i.checked).length / items.length) * 100);
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8 py-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <Link to={`/trips/${id}`} className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            <ChevronLeft className="h-4 w-4" />
-            Back to Itinerary
-          </Link>
-          <h1 className="text-3xl font-bold tracking-tight">Packing Checklist</h1>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-primary">{progress}%</p>
-          <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Progress</p>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner">
-        <div 
-          className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-700 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      <div className="grid md:grid-cols-4 gap-8">
-        {/* Categories Sidebar */}
-        <aside className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Categories</label>
-            <nav className="space-y-1">
-              {[
-                { name: 'All', icon: Filter },
-                { name: 'Documents', icon: Briefcase },
-                { name: 'Clothing', icon: Package },
-                { name: 'Electronics', icon: Camera },
-                { name: 'Essentials', icon: HeartPulse },
-              ].map((cat) => (
-                <button
-                  key={cat.name}
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    selectedCategory === cat.name 
-                      ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' 
-                      : 'hover:bg-muted text-muted-foreground'
-                  }`}
-                >
-                  <cat.icon className="h-4 w-4" />
-                  {cat.name}
-                </button>
-              ))}
-            </nav>
+    <div className="max-w-5xl mx-auto py-12 space-y-12 animate-premium">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-100 pb-10">
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate(`/trips/${id}`)}
+            className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary hover:bg-slate-100 transition-all"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="space-y-1 text-left">
+            <h1 className="text-4xl font-black text-secondary tracking-tight">Essential <span className="text-primary italic">Checklist.</span></h1>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Master list for: Tropical Escape</p>
           </div>
-        </aside>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right mr-4">
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Progress</p>
+            <p className="text-2xl font-black text-secondary">50%</p>
+          </div>
+          <div className="w-24 h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-full bg-primary rounded-full shadow-glow" style={{ width: '50%' }} />
+          </div>
+        </div>
+      </div>
 
-        {/* Checklist Content */}
-        <div className="md:col-span-3 space-y-6">
-          {/* Add Item Form */}
-          <form onSubmit={addItem} className="flex gap-2 p-2 bg-card border rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-            <input 
-              type="text" 
-              placeholder="Add a new item to pack..." 
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              className="flex-1 bg-transparent border-none focus:ring-0 px-4 text-sm"
-            />
-            <button 
-              type="submit"
-              className="bg-primary text-white p-2.5 rounded-xl hover:bg-primary/90 transition-colors shadow-md"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
-          </form>
+      <div className="grid lg:grid-cols-3 gap-12">
+        {/* Input & Categories */}
+        <div className="space-y-10">
+          <Card className="p-10 space-y-8 bg-slate-50 border-none shadow-premium">
+            <h3 className="text-2xl font-black text-secondary">Add Item</h3>
+            <div className="space-y-6">
+              <Input label="Item Name" placeholder="e.g. Extra batteries" icon={Plus} />
+              <Input label="Category" placeholder="Documentation" icon={Tag} />
+              <Button className="w-full h-16 shadow-lg">Add to Checklist</Button>
+            </div>
+          </Card>
 
-          {/* Items List */}
-          <div className="space-y-3">
-            {items
-              .filter(i => selectedCategory === 'All' || i.category === selectedCategory)
-              .map((item) => (
+          <Card className="p-10 space-y-6 bg-secondary text-white border-none shadow-2xl relative overflow-hidden group">
+            <div className="relative z-10 space-y-6">
+              <div className="bg-primary p-3 rounded-xl w-fit shadow-glow">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-black leading-tight">Pro Tip</h3>
+              <p className="text-sm font-bold text-white/50 leading-relaxed">
+                Always keep digital copies of your <span className="text-primary">Documentation</span> category items in your Notes.
+              </p>
+            </div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[60px] -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000" />
+          </Card>
+        </div>
+
+        {/* List Area */}
+        <div className="lg:col-span-2 space-y-10">
+           <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-6">
+                 {['All', 'Documentation', 'Gear', 'Bookings'].map(cat => (
+                   <button key={cat} className={cn("text-xs font-black uppercase tracking-widest transition-all", cat === 'All' ? "text-primary" : "text-slate-400 hover:text-secondary")}>
+                      {cat}
+                   </button>
+                 ))}
+              </div>
+              <Button variant="ghost" className="h-10 text-slate-400 gap-2">
+                 <Filter className="h-4 w-4" />
+                 Sort
+              </Button>
+           </div>
+
+           <div className="space-y-4">
+              {items.map(item => (
                 <div 
                   key={item.id}
-                  className={`group flex items-center justify-between p-4 rounded-2xl border bg-card transition-all hover:shadow-md ${
-                    item.checked ? 'bg-muted/30 border-muted opacity-80' : 'hover:border-primary/50'
-                  }`}
+                  onClick={() => toggleItem(item.id)}
+                  className={cn(
+                    "group flex items-center justify-between p-6 rounded-[24px] border-2 transition-all cursor-pointer",
+                    item.completed 
+                      ? "bg-slate-50 border-slate-50 opacity-60" 
+                      : "bg-white border-slate-100 hover:border-primary/20 hover:shadow-md"
+                  )}
                 >
-                  <div className="flex items-center gap-4 cursor-pointer" onClick={() => toggleItem(item.id)}>
-                    <div className={`transition-transform duration-200 ${item.checked ? 'scale-110' : 'group-hover:scale-110'}`}>
-                      {item.checked ? (
-                        <CheckSquare className="h-6 w-6 text-primary fill-primary/10" />
-                      ) : (
-                        <Square className="h-6 w-6 text-muted-foreground" />
-                      )}
+                  <div className="flex items-center gap-6">
+                    <div className={cn(
+                      "h-10 w-10 rounded-xl flex items-center justify-center transition-all",
+                      item.completed ? "bg-primary text-white" : "bg-slate-50 text-slate-300 group-hover:text-primary"
+                    )}>
+                      {item.completed ? <CheckSquare className="h-6 w-6" /> : <Square className="h-6 w-6" />}
                     </div>
-                    <div>
-                      <p className={`font-medium transition-all ${item.checked ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                        {item.text}
-                      </p>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{item.category}</span>
+                    <div className="text-left">
+                      <p className={cn("text-xl font-black transition-all", item.completed ? "text-slate-400 line-through" : "text-secondary")}>{item.text}</p>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.category}</span>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => deleteItem(item.id)}
-                    className="p-2 text-destructive opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded-lg transition-all"
-                  >
-                    <Trash2 className="h-4 w-4" />
+                  <button className="p-3 text-slate-200 hover:text-destructive hover:bg-destructive/5 rounded-xl transition-all">
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
               ))}
-            
-            {items.length === 0 && (
-              <div className="py-20 text-center border-2 border-dashed rounded-3xl space-y-4">
-                <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto" />
-                <p className="text-muted-foreground">No items in this category.</p>
-              </div>
-            )}
-          </div>
+           </div>
+           
+           <div className="flex items-center justify-center gap-4 py-8 border-t border-dashed border-slate-100">
+              <Info className="h-5 w-5 text-primary" />
+              <p className="text-sm font-bold text-slate-400">Total 12 items. 6 remaining for absolute readiness.</p>
+           </div>
         </div>
       </div>
     </div>

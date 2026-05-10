@@ -1,201 +1,166 @@
-import { useState } from 'react';
 import { 
-  User as UserIcon, Mail, MapPin, Calendar, Settings, 
-  Edit3, Grid, Heart, Map, Bell, Shield, 
-  LogOut, Camera, ChevronRight, Globe 
+  User, Settings, MapPin, Calendar, 
+  Star, ShieldCheck, Heart, Plane, 
+  Compass, History, Edit3, Camera
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Button, Card, cn } from '@/components/common/UI';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState('Overview');
 
   return (
-    <div className="space-y-12 py-10">
-      {/* Profile Header */}
-      <div className="relative group">
-        {/* Cover Image */}
-        <div className="h-80 rounded-[60px] bg-secondary border-8 border-white shadow-premium overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070" 
-            className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000"
-            alt="cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-secondary via-transparent to-transparent" />
+    <div className="space-y-12 pb-20 animate-premium">
+      {/* Profile Hero */}
+      <div className="relative pt-12">
+        <div className="absolute top-0 left-0 right-0 h-80 bg-secondary rounded-[48px] -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-primary/5 blur-[80px]" />
+          <div className="absolute bottom-[-50%] right-[-10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]" />
         </div>
-        
-        {/* Profile Info Overlay */}
-        <div className="px-12 -mt-24 flex flex-col md:flex-row md:items-end justify-between gap-8 relative z-10">
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
-            <div className="relative group/avatar">
-              <div className="h-48 w-48 rounded-[48px] border-[10px] border-white bg-card overflow-hidden shadow-2xl">
-                <img 
-                  src={`https://i.pravatar.cc/400?u=${user?.id}`} 
-                  alt="avatar" 
-                  className="h-full w-full object-cover group-hover/avatar:scale-110 transition-transform duration-500" 
-                />
-              </div>
-              <button className="absolute bottom-4 right-4 p-3 bg-primary text-white rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all opacity-0 group-hover/avatar:opacity-100">
+
+        <div className="container mx-auto px-10">
+          <div className="flex flex-col md:flex-row md:items-end gap-10">
+            <div className="relative group">
+              <img 
+                src={`https://i.pravatar.cc/300?u=${user?.id}`} 
+                className="h-48 w-48 rounded-[40px] border-[12px] border-white shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
+                alt="Profile"
+              />
+              <button className="absolute bottom-4 right-4 p-3 bg-primary text-white rounded-2xl shadow-xl hover:scale-110 transition-all">
                 <Camera className="h-5 w-5" />
               </button>
             </div>
             
-            <div className="text-center md:text-left space-y-2 pb-6">
-              <h1 className="text-5xl font-black tracking-tight text-white drop-shadow-lg">
-                {user?.firstName} {user?.lastName}
-              </h1>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-white/80 font-bold">
-                <span className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  New York, USA
-                </span>
-                <span className="flex items-center gap-2 text-sm">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  Member since 2024
-                </span>
+            <div className="flex-1 pb-4 space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-2 text-left">
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-5xl font-black text-white tracking-tighter">{user?.firstName} {user?.lastName}</h1>
+                    <div className="bg-primary p-1.5 rounded-xl shadow-glow">
+                      <ShieldCheck className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 text-white/60 font-bold">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      San Francisco, CA
+                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      Joined Oct 2023
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <Button variant="secondary" className="h-14 px-8 glass text-white border-white/10">
+                    <Settings className="h-5 w-5" />
+                    Settings
+                  </Button>
+                  <Button className="h-14 px-8 shadow-glow">
+                    <Edit3 className="h-5 w-5" />
+                    Edit Profile
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-4 pb-8">
-            <Button variant="secondary" size="lg" className="bg-white text-secondary hover:bg-white/90">
-              <Edit3 className="h-4 w-4" />
-              Edit Profile
-            </Button>
-            <Button variant="ghost" className="h-14 w-14 glass text-white hover:bg-white/20 p-0 rounded-2xl">
-              <Settings className="h-6 w-6" />
-            </Button>
           </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-12 gap-12">
-        {/* Left Column - Stats & Settings */}
-        <div className="lg:col-span-4 space-y-8">
-          <Card className="p-10 space-y-10">
-            <div className="grid grid-cols-2 gap-8">
-              <Stat label="Total Trips" value="24" />
-              <Stat label="Stories" value="12" />
-              <Stat label="Followers" value="1.8k" />
-              <Stat label="Following" value="840" />
+        {/* Left Sidebar - Stats */}
+        <div className="lg:col-span-4 space-y-10">
+          <Card className="p-10 space-y-8 border-none shadow-premium bg-slate-50">
+            <h3 className="text-2xl font-black text-secondary">Travel Statistics</h3>
+            <div className="grid gap-6">
+              <ProfileStat icon={Compass} label="Countries" value="12" color="text-blue-500" />
+              <ProfileStat icon={Plane} label="Total Trips" value="48" color="text-primary" />
+              <ProfileStat icon={Star} label="Loop Points" value="12,450" color="text-yellow-500" />
             </div>
-
-            <div className="pt-10 border-t border-border/60 space-y-2">
-              <MenuButton icon={Bell} label="Notifications" badge="3" />
-              <MenuButton icon={Shield} label="Privacy & Security" />
-              <MenuButton icon={Globe} label="Connected Apps" />
-              <MenuButton icon={LogOut} label="Sign Out" variant="danger" />
+            <div className="pt-8 border-t border-slate-200">
+               <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Expertise Level</h4>
+               <div className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <span className="text-sm font-black text-secondary">Pro Explorer</span>
+                    <span className="text-xs font-black text-primary">85% to Legend</span>
+                  </div>
+                  <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full shadow-glow" style={{ width: '85%' }} />
+                  </div>
+               </div>
             </div>
           </Card>
 
-          <Card className="bg-primary/5 border-primary/20 p-8 space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-secondary">Traveloop Pro</h3>
-              <p className="text-sm font-medium text-muted leading-relaxed">
-                Unlock exclusive perks like AI itinerary generation and unlimited trip storage.
-              </p>
+          <Card className="p-10 space-y-6 border-none shadow-premium">
+            <h3 className="text-xl font-black text-secondary">Interests</h3>
+            <div className="flex flex-wrap gap-2">
+              {['Beach', 'Hiking', 'Architecture', 'Nightlife', 'Foodie', 'History'].map(tag => (
+                <span key={tag} className="px-4 py-2 rounded-xl bg-slate-50 text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 hover:border-primary/30 hover:text-primary cursor-pointer transition-all">
+                  {tag}
+                </span>
+              ))}
             </div>
-            <Button size="lg" className="w-full">Upgrade Now</Button>
           </Card>
         </div>
 
-        {/* Right Column - Content */}
+        {/* Right Area - Tabs & Content */}
         <div className="lg:col-span-8 space-y-10">
-          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar border-b border-border/60 pb-1">
-            {['Overview', 'My Trips', 'Saved Locations', 'Travel Journal'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  "px-8 py-4 text-sm font-black transition-all relative",
-                  activeTab === tab 
-                    ? "text-primary" 
-                    : "text-muted hover:text-secondary"
-                )}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-glow" />
-                )}
-              </button>
-            ))}
+          <div className="flex items-center gap-10 border-b border-slate-100 pb-6 px-2">
+            <ProfileTab label="My Adventures" icon={History} active />
+            <ProfileTab label="Saved Places" icon={Heart} />
+            <ProfileTab label="Reviews" icon={Star} />
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <ActivityCard 
-              icon={Map} 
-              title="Current Trip: Tokyo 2024" 
-              desc="Itinerary is 75% complete. Next step: Book Shinkansen tickets." 
-              progress={75}
-            />
-            <ActivityCard 
-              icon={Heart} 
-              title="Saved: Swiss Alps Guide" 
-              desc="You added this to your 'Winter Sports' collection yesterday." 
-              color="text-red-500"
-            />
+            {[1, 2, 3, 4].map(i => (
+              <Card key={i} padding="none" className="group overflow-hidden border-none shadow-premium hover:shadow-2xl">
+                 <div className="relative h-56 overflow-hidden">
+                    <img src={`https://images.unsplash.com/photo-${1500000000000 + i * 10000}?q=80&w=2000`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="trip" />
+                    <div className="absolute top-4 right-4 glass p-2 rounded-xl text-secondary">
+                      <Heart className="h-4 w-4" />
+                    </div>
+                 </div>
+                 <div className="p-8 space-y-3 text-left">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Completed Trip</span>
+                    <h4 className="text-2xl font-black text-secondary group-hover:text-primary transition-colors">Summer in {['Paris', 'Tokyo', 'London', 'Berlin'][i-1]}</h4>
+                    <p className="text-sm font-bold text-slate-400">May 12 - 20, 2023 • 2 Travelers</p>
+                 </div>
+              </Card>
+            ))}
           </div>
-
-          <div className="space-y-6">
-            <h3 className="text-2xl font-black text-secondary ml-2">About Me</h3>
-            <Card className="p-10 leading-relaxed text-muted font-medium italic">
-              "Avid traveler, photography enthusiast, and coffee lover. I believe the best way to see the world is one train ride at a time. Currently planning my next big adventure through Southeast Asia."
-            </Card>
-          </div>
+          
+          <Button variant="outline" className="w-full h-16 border-slate-100 text-slate-400 hover:text-secondary">Load Older Activities</Button>
         </div>
       </div>
     </div>
   );
 }
 
-function Stat({ label, value }) {
+function ProfileStat({ icon: Icon, label, value, color }) {
   return (
-    <div className="space-y-1">
-      <p className="text-3xl font-black text-secondary">{value}</p>
-      <p className="text-[10px] font-black uppercase tracking-widest text-muted">{label}</p>
+    <div className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-50 shadow-sm hover:shadow-md transition-all">
+      <div className="flex items-center gap-4">
+        <div className={cn("p-3 rounded-xl bg-slate-50", color.replace('text', 'bg').replace('500', '100'))}>
+          <Icon className={cn("h-6 w-6", color)} />
+        </div>
+        <span className="text-sm font-black text-slate-400 uppercase tracking-widest">{label}</span>
+      </div>
+      <span className="text-2xl font-black text-secondary">{value}</span>
     </div>
   );
 }
 
-function MenuButton({ icon: Icon, label, badge, variant }) {
+function ProfileTab({ label, icon: Icon, active }) {
   return (
     <button className={cn(
-      "w-full flex items-center justify-between p-4 rounded-[20px] transition-all group hover:bg-muted/5",
-      variant === 'danger' ? "text-destructive hover:bg-destructive/5" : "text-muted hover:text-secondary"
+      "flex items-center gap-3 pb-6 mb-[-25px] transition-all relative",
+      active ? "text-secondary" : "text-slate-400 hover:text-secondary"
     )}>
-      <div className="flex items-center gap-4">
-        <Icon className="h-5 w-5" />
-        <span className="text-sm font-bold">{label}</span>
-      </div>
-      <div className="flex items-center gap-2">
-        {badge && <span className="px-2 py-0.5 bg-primary text-white text-[10px] font-black rounded-lg shadow-glow">{badge}</span>}
-        <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-      </div>
+      <Icon className={cn("h-5 w-5", active ? "text-primary" : "text-slate-300")} />
+      <span className="text-sm font-black uppercase tracking-widest">{label}</span>
+      {active && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-glow" />}
     </button>
-  );
-}
-
-function ActivityCard({ icon: Icon, title, desc, progress, color }) {
-  return (
-    <Card className="group cursor-pointer hover:border-primary/50 transition-all">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className={cn("p-4 rounded-2xl bg-muted/5 group-hover:scale-110 transition-transform", color || "text-primary")}>
-            <Icon className="h-6 w-6" />
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted">Activity</span>
-        </div>
-        <div className="space-y-2">
-          <h4 className="text-xl font-black text-secondary group-hover:text-primary transition-colors">{title}</h4>
-          <p className="text-xs font-bold text-muted leading-relaxed">{desc}</p>
-        </div>
-        {progress && (
-          <div className="w-full bg-muted/10 h-2 rounded-full overflow-hidden">
-            <div className="bg-primary h-full rounded-full shadow-glow" style={{ width: `${progress}%` }} />
-          </div>
-        )}
-      </div>
-    </Card>
   );
 }
