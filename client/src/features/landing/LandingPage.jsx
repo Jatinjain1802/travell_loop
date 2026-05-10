@@ -40,7 +40,7 @@ export default function LandingPage() {
 
         {/* Floating Logo / Identity */}
         <div className="pt-10 animate-premium [animation-delay:400ms]">
-          <img src="/travelloop_logo.png" className="h-24 md:h-32 object-contain hover:scale-105 transition-transform duration-500" alt="Traveloop Logo" />
+          <img src="/travelloop_logo.png" className="h-24 md:h-32 object-contain hover:scale-110 transition-transform duration-500 cursor-help" alt="Traveloop Logo" title="Start your loop" />
         </div>
       </section>
 
@@ -111,7 +111,7 @@ function DestinationCard({ image, title, rating, price, tag }) {
     <Card padding="none" className="group overflow-hidden border-none shadow-premium">
       <div className="relative h-[400px] overflow-hidden">
         <img src={image} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={title} />
-        <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-linear-to-t from-secondary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-sm font-black shadow-xl">
           <Star className="h-4 w-4 text-primary fill-primary" />
           {rating}

@@ -1,55 +1,89 @@
 import { create } from 'zustand';
+import { tripApi } from '@/api/tripApi';
 
 export const useTripStore = create((set, get) => ({
   trips: [],
   loading: false,
+  error: null,
   currentTrip: null,
+  itinerary: [],
 
-  // Mock fetching trips
-  fetchTrips: async () => {
-    set({ loading: true });
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Initial mock data if empty
-    if (get().trips.length === 0) {
-      set({
-        trips: [
-          {
-            id: '1',
-            title: 'Summer in Swiss Alps',
-            place: 'Switzerland',
-            startDate: '2024-06-15',
-            endDate: '2024-06-25',
-            status: 'completed',
-            totalBudget: 3500,
-            image: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?q=80&w=1965',
-            sections: []
-          }
-        ]
-      });
+  fetchTrips: async (status) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await tripApi.getTrips(status);
+      set({ trips: response.data.trips, loading: false });
+    } catch (error) {
+      set({ error: 'Failed to fetch trips', loading: false });
     }
-    set({ loading: false });
   },
 
-  addTrip: (trip) => set((state) => ({ 
-    trips: [
-      ...state.trips, 
-      { 
-        ...trip, 
-        id: Math.random().toString(36).substr(2, 9),
-        status: 'upcoming' 
-      }
-    ] 
-  })),
+  fetchTrip: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await tripApi.getTrip(id);
+      set({ currentTrip: response.data.trip, loading: false });
+      return response.data.trip;
+    } catch (error) {
+      set({ error: 'Failed to fetch trip details', loading: false });
+      throw error;
+    }
+  },
 
-  updateTrip: (id, data) => set((state) => ({
-    trips: state.trips.map(t => t.id === id ? { ...t, ...data } : t)
-  })),
+  addTrip: async (tripData) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await tripApi.createTrip(tripData);
+      set((state) => ({ 
+        trips: [response.data.trip, ...state.trips],
+        loading: false 
+      }));
+      return response.data.trip;
+    } catch (error) {
+      set({ error: 'Failed to create trip', loading: false });
+      throw error;
+    }
+  },
 
-  deleteTrip: (id) => set((state) => ({
-    trips: state.trips.filter(t => t.id !== id)
-  })),
+  updateTrip: async (id, data) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await tripApi.updateTrip(id, data);
+      set((state) => ({
+        trips: state.trips.map(t => t.id === id ? response.data.trip : t),
+        currentTrip: state.currentTrip?.id === id ? response.data.trip : state.currentTrip,
+        loading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to update trip', loading: false });
+      throw error;
+    }
+  },
+
+  deleteTrip: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await tripApi.deleteTrip(id);
+      set((state) => ({
+        trips: state.trips.filter(t => t.id !== id),
+        loading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to delete trip', loading: false });
+      throw error;
+    }
+  },
+
+  fetchItinerary: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await tripApi.getItinerary(id);
+      set({ itinerary: response.data.itinerary, loading: false });
+    } catch (error) {
+      set({ error: 'Failed to fetch itinerary', loading: false });
+    }
+  },
 
   setCurrentTrip: (trip) => set({ currentTrip: trip }),
 }));
+

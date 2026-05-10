@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import MainLayout from '@/components/layout/MainLayout';
 import LoginPage from '@/features/auth/LoginPage';
 import RegisterPage from '@/features/auth/RegisterPage';
@@ -15,8 +17,29 @@ import ChecklistPage from '@/features/checklist/ChecklistPage';
 import NotesPage from '@/features/notes/NotesPage';
 import InvoicePage from '@/features/invoice/InvoicePage';
 
+
 function App() {
+  const { checkAuth, loading } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-6">
+          <img src="/travelloop_logo.png" className="h-20 animate-pulse" alt="Loading" />
+          <div className="h-1 w-48 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-full bg-primary animate-progress origin-left" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
+
     <Router>
       <Routes>
         {/* Public Routes */}
