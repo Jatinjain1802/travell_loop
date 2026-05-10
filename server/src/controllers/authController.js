@@ -1,11 +1,12 @@
 const bcrypt = require('bcryptjs');
 const { StatusCodes } = require('http-status-codes');
 const { z } = require('zod');
-const { User } = require('../models');
+const { User, RefreshToken } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const sanitizeUser = require('../utils/sanitizeUser');
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { setAuthCookies, clearAuthCookies } = require('../utils/cookies');
+const hashToken = require('../utils/hashToken');
 
 const registerSchema = z.object({
   firstName: z.string().min(2),
@@ -23,6 +24,21 @@ const loginSchema = z.object({
   password: z.string().min(8)
 });
 
+async function issueSession(res, user) {
+  const accessToken = signAccessToken(user);
+  const refreshToken = signRefreshToken(user);
+  const refreshPayload = verifyRefreshToken(refreshToken);
+
+  await RefreshToken.create({
+    userId: user.id,
+    tokenHash: hashToken(refreshToken),
+    expiresAt: new Date(refreshPayload.exp * 1000)
+  });
+
+  setAuthCookies(res, accessToken, refreshToken);
+  return accessToken;
+}
+
 const register = asyncHandler(async (req, res) => {
   const payload = registerSchema.parse(req.body);
 
@@ -32,15 +48,8 @@ const register = asyncHandler(async (req, res) => {
   }
 
   const passwordHash = await bcrypt.hash(payload.password, 10);
-
-  const user = await User.create({
-    ...payload,
-    passwordHash
-  });
-
-  const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
-  setAuthCookies(res, accessToken, refreshToken);
+  const user = await User.create({ ...payload, passwordHash });
+  const accessToken = await issueSession(res, user);
 
   return res.status(StatusCodes.CREATED).json({
     message: 'Registered successfully',
@@ -62,9 +71,7 @@ const login = asyncHandler(async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid credentials' });
   }
 
-  const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
-  setAuthCookies(res, accessToken, refreshToken);
+  const accessToken = await issueSession(res, user);
 
   return res.status(StatusCodes.OK).json({
     message: 'Login successful',
@@ -78,7 +85,6 @@ const me = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
   }
-
   return res.status(StatusCodes.OK).json({ user: sanitizeUser(user) });
 });
 
@@ -90,15 +96,19 @@ const refresh = asyncHandler(async (req, res) => {
 
   try {
     const payload = verifyRefreshToken(refreshToken);
-    const user = await User.findByPk(payload.sub);
+    const stored = await RefreshToken.findOne({ where: { tokenHash: hashToken(refreshToken), userId: payload.sub } });
 
+    if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid refresh token' });
+    }
+
+    const user = await User.findByPk(payload.sub);
     if (!user || !user.isActive) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid refresh token' });
     }
 
-    const accessToken = signAccessToken(user);
-    const newRefreshToken = signRefreshToken(user);
-    setAuthCookies(res, accessToken, newRefreshToken);
+    await stored.update({ revokedAt: new Date() });
+    const accessToken = await issueSession(res, user);
 
     return res.status(StatusCodes.OK).json({ token: accessToken });
   } catch (_err) {
@@ -106,9 +116,19 @@ const refresh = asyncHandler(async (req, res) => {
   }
 });
 
-const logout = asyncHandler(async (_req, res) => {
+const logout = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (refreshToken) {
+    await RefreshToken.update({ revokedAt: new Date() }, { where: { tokenHash: hashToken(refreshToken) } });
+  }
   clearAuthCookies(res);
   return res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
+});
+
+const logoutAll = asyncHandler(async (req, res) => {
+  await RefreshToken.update({ revokedAt: new Date() }, { where: { userId: req.user.id, revokedAt: null } });
+  clearAuthCookies(res);
+  return res.status(StatusCodes.OK).json({ message: 'Logged out from all devices' });
 });
 
 module.exports = {
@@ -116,5 +136,6 @@ module.exports = {
   login,
   me,
   refresh,
-  logout
+  logout,
+  logoutAll
 };

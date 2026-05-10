@@ -8,6 +8,7 @@ const Invoice = require('./Invoice');
 const InvoiceItem = require('./InvoiceItem');
 const CommunityPost = require('./CommunityPost');
 const Destination = require('./Destination');
+const RefreshToken = require('./RefreshToken');
 
 User.hasMany(Trip, { foreignKey: 'userId', as: 'trips', onDelete: 'CASCADE' });
 Trip.belongsTo(User, { foreignKey: 'userId', as: 'user' });
@@ -35,6 +36,9 @@ CommunityPost.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 Trip.hasMany(CommunityPost, { foreignKey: 'tripId', as: 'posts', onDelete: 'SET NULL' });
 CommunityPost.belongsTo(Trip, { foreignKey: 'tripId', as: 'trip' });
 
+User.hasMany(RefreshToken, { foreignKey: 'userId', as: 'refreshTokens', onDelete: 'CASCADE' });
+RefreshToken.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 module.exports = {
   User,
   Trip,
@@ -45,5 +49,6 @@ module.exports = {
   Invoice,
   InvoiceItem,
   CommunityPost,
-  Destination
+  Destination,
+  RefreshToken
 };

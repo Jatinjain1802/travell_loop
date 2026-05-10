@@ -7,6 +7,7 @@ function sanitizeUser(user) {
     phone: user.phone,
     city: user.city,
     country: user.country,
+    profilePic: user.profilePic,
     bio: user.bio,
     role: user.role,
     isActive: user.isActive,

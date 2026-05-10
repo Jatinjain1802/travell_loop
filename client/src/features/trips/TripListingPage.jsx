@@ -1,135 +1,164 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Calendar, MapPin, ChevronRight, Clock, MoreVertical, Search, Filter } from 'lucide-react';
+import { 
+  Plus, Search, MapPin, 
+  ChevronRight, Filter, TrendingUp, Sparkles,
+  Clock, Users, MoreHorizontal
+} from 'lucide-react';
 import { useTripStore } from '@/store/tripStore';
+import { Button, Card, cn } from '@/components/common/UI';
 
 export default function TripListingPage() {
-  const { trips, loading, fetchTrips } = useTripStore();
-
-  useEffect(() => {
-    fetchTrips();
-  }, [fetchTrips]);
+  const { trips } = useTripStore();
 
   return (
-    <div className="space-y-8 py-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">My Travels</h1>
-          <p className="text-muted-foreground mt-1">Manage and view all your planned adventures</p>
+    <div className="space-y-12 py-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+        <div className="space-y-4 text-left">
+          <h1 className="text-5xl font-black tracking-tight text-white">My <span className="text-primary italic">Trips</span></h1>
+          <p className="text-slate-400 font-medium max-w-lg leading-relaxed">Manage your upcoming adventures and relive past journeys in high fidelity.</p>
         </div>
-        <Link 
-          to="/trips/create" 
-          className="bg-primary text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-primary/20"
-        >
-          <Plus className="h-5 w-5" />
-          Plan New Trip
-        </Link>
+        <div className="flex items-center gap-4">
+          <div className="relative group flex-1 lg:flex-none">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Search trips..." 
+              className="h-14 pl-12 pr-6 rounded-2xl glass border-white/5 text-sm font-bold focus:ring-4 focus:ring-primary/10 transition-all outline-none w-full lg:w-64 text-white"
+            />
+          </div>
+          <Link to="/trips/create">
+            <Button size="lg" className="h-14 px-8 shadow-glow">
+              <Plus className="h-5 w-5" />
+              New Trip
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      {/* Filters & Search */}
-      <div className="flex flex-col sm:flex-row items-center gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-          <input 
-            type="text" 
-            placeholder="Search trips by destination or title..." 
-            className="w-full h-12 pl-10 pr-4 rounded-2xl border bg-card focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-          />
-        </div>
-        <button className="flex items-center gap-2 px-6 h-12 border rounded-2xl bg-card hover:bg-muted transition-colors font-medium">
-          <Filter className="h-5 w-5" />
-          Filters
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-[300px] bg-muted animate-pulse rounded-3xl" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trips.length === 0 ? (
-            <div className="col-span-full py-20 text-center space-y-4">
-              <div className="bg-muted w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Calendar className="h-10 w-10 text-muted-foreground" />
-              </div>
-              <h3 className="text-xl font-bold">No trips found</h3>
-              <p className="text-muted-foreground">You haven't planned any adventures yet.</p>
-              <Link to="/trips/create" className="text-primary font-bold hover:underline inline-block mt-4">
-                Start your first trip now
-              </Link>
+      <div className="grid lg:grid-cols-12 gap-12">
+        {/* Main Feed */}
+        <div className="lg:col-span-9 space-y-8">
+          <div className="flex items-center justify-between border-b border-white/5 pb-6 px-2">
+            <div className="flex items-center gap-6">
+              <button className="text-sm font-black text-primary relative pb-6 mb-[-25px]">
+                Active Trips
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-glow" />
+              </button>
+              <button className="text-sm font-black text-slate-500 hover:text-white transition-colors pb-6 mb-[-25px]">
+                Past Adventures
+              </button>
             </div>
-          ) : (
-            trips.map((trip) => (
-              <div key={trip.id} className="group bg-card border rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={trip.image || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=2070'} 
-                    alt={trip.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md ${
-                      trip.status === 'completed' ? 'bg-green-500/80 text-white' : 'bg-primary/80 text-white'
-                    }`}>
-                      {trip.status}
-                    </span>
-                    <button className="p-1.5 bg-black/20 hover:bg-black/40 rounded-full text-white backdrop-blur-md transition-colors">
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold group-hover:text-primary transition-colors line-clamp-1">{trip.title}</h3>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-3 w-3" />
-                      {trip.place}
+            <Button variant="ghost" className="h-10 px-4 gap-2 text-slate-500">
+              <Filter className="h-4 w-4" />
+              Filter
+            </Button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {trips.map((trip) => (
+              <Card key={trip.id} padding="none" className="group overflow-hidden">
+                <Link to={`/trips/${trip.id}`} className="block">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={`https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070`} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                      alt={trip.title}
+                    />
+                    <div className="absolute top-6 left-6 glass px-3 py-1.5 rounded-full flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white shadow-xl">
+                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      In 12 Days
                     </div>
                   </div>
-
-                  <div className="flex items-center justify-between py-4 border-y border-dashed">
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Duration</p>
-                      <div className="flex items-center gap-1 text-sm font-medium">
-                        <Clock className="h-3.5 w-3.5" />
-                        10 Days
+                  <div className="p-8 space-y-6 text-left">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-2xl font-black text-white group-hover:text-primary transition-colors leading-tight">{trip.title}</h3>
+                        <button className="p-2 text-slate-500 hover:text-white transition-colors">
+                          <MoreHorizontal className="h-5 w-5" />
+                        </button>
                       </div>
-                    </div>
-                    <div className="space-y-1 text-right">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Budget</p>
-                      <p className="text-sm font-bold text-foreground">${trip.totalBudget || '0'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex -space-x-2">
-                      {[1, 2].map(i => (
-                        <div key={i} className="h-8 w-8 rounded-full border-2 border-card bg-muted flex items-center justify-center overflow-hidden">
-                          <img src={`https://i.pravatar.cc/100?u=${trip.id}${i}`} alt="user" />
+                      <div className="flex items-center gap-3 text-sm font-bold text-slate-500">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          {trip.place}
                         </div>
-                      ))}
-                      <div className="h-8 w-8 rounded-full border-2 border-card bg-muted flex items-center justify-center text-[10px] font-bold">
-                        +3
+                        <div className="w-1 h-1 rounded-full bg-slate-800" />
+                        <div className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4 text-primary" />
+                          2 Travelers
+                        </div>
                       </div>
                     </div>
-                    <Link 
-                      to={`/trips/${trip.id}`} 
-                      className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 transition-all"
-                    >
-                      View Details
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
+
+                    <div className="pt-6 border-t border-dashed border-white/5 flex items-center justify-between">
+                      <div className="flex -space-x-3">
+                        {[1, 2, 3].map(i => (
+                          <img key={i} src={`https://i.pravatar.cc/100?u=${i}`} className="h-8 w-8 rounded-lg border-2 border-card shadow-lg" alt="user" />
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                        View Itinerary
+                        <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </Link>
+              </Card>
+            ))}
+
+            <Link to="/trips/create" className="h-[480px] rounded-[32px] border-2 border-dashed border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all group flex flex-col items-center justify-center gap-4">
+              <div className="h-16 w-16 bg-white/5 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-500">
+                <Plus className="h-8 w-8 text-slate-500 group-hover:text-white transition-colors" />
               </div>
-            ))
-          )}
+              <div className="text-center">
+                <p className="text-lg font-black text-white">Create New Trip</p>
+                <p className="text-sm font-bold text-slate-500">Plan your next masterpiece</p>
+              </div>
+            </Link>
+          </div>
         </div>
-      )}
+
+        {/* Sidebar Insights */}
+        <div className="lg:col-span-3 space-y-8">
+          <Card className="bg-secondary p-8 text-white relative overflow-hidden group">
+            <div className="relative z-10 space-y-6">
+              <div className="bg-white/10 p-3 rounded-2xl w-fit">
+                <Sparkles className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-black leading-tight">AI Travel Insight</h3>
+              <p className="text-sm font-bold text-white/50 leading-relaxed">
+                Based on your interest in "Nature", you might love exploring the Swiss Alps this winter.
+              </p>
+              <Button variant="outline" className="w-full h-12 border-white/10 text-white hover:bg-white/5">Get Recommendation</Button>
+            </div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[60px] -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000" />
+          </Card>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-black text-white ml-2 text-left">Quick Stats</h3>
+            <div className="grid gap-4">
+              <StatItem label="Total Miles" value="12,450" icon={TrendingUp} />
+              <StatItem label="Cities Visited" value="24" icon={MapPin} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function StatItem({ label, value, icon: Icon }) {
+  return (
+    <Card padding="sm" className="bg-white/[0.02] border-white/5">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-primary/10 rounded-xl">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+        <div className="text-left">
+          <p className="text-2xl font-black text-white leading-none">{value}</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">{label}</p>
+        </div>
+      </div>
+    </Card>
   );
 }

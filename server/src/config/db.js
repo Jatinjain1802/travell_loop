@@ -6,6 +6,7 @@ const sequelize = new Sequelize(env.db.name, env.db.user, env.db.password, {
   port: env.db.port,
   dialect: env.db.dialect,
   logging: false,
+  dialectOptions: env.db.ssl ? { ssl: { require: true, rejectUnauthorized: false } } : {},
   define: {
     underscored: true,
     freezeTableName: true,

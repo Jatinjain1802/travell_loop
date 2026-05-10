@@ -1,6 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const { z } = require('zod');
-const { Trip, TripSection } = require('../models');
+const { Trip, TripSection, Activity } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 
 const sectionSchema = z.object({
@@ -106,10 +106,37 @@ const deleteTrip = asyncHandler(async (req, res) => {
   return res.status(StatusCodes.OK).json({ message: 'Trip deleted successfully' });
 });
 
+const getItinerary = asyncHandler(async (req, res) => {
+  const trip = await Trip.findOne({
+    where: { id: req.params.id, userId: req.user.id },
+    include: [{
+      model: TripSection,
+      as: 'sections',
+      include: [{ model: Activity, as: 'activities' }]
+    }]
+  });
+  if (!trip) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Trip not found' });
+  return res.status(StatusCodes.OK).json({ itinerary: trip.sections });
+});
+
+const updateItinerary = asyncHandler(async (req, res) => {
+  const trip = await Trip.findOne({ where: { id: req.params.id, userId: req.user.id } });
+  if (!trip) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Trip not found' });
+  const sections = z.array(sectionSchema).parse(req.body.sections || []);
+  await TripSection.destroy({ where: { tripId: trip.id } });
+  if (sections.length) {
+    await TripSection.bulkCreate(sections.map((s) => ({ ...s, tripId: trip.id })));
+  }
+  const updated = await Trip.findByPk(trip.id, { include: [{ model: TripSection, as: 'sections' }] });
+  return res.status(StatusCodes.OK).json({ trip: updated });
+});
+
 module.exports = {
   listTrips,
   createTrip,
   getTripById,
   updateTrip,
-  deleteTrip
+  deleteTrip,
+  getItinerary,
+  updateItinerary
 };

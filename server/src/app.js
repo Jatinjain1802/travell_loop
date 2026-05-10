@@ -4,6 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const routes = require('./routes');
 const env = require('./config/env');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
@@ -26,6 +27,7 @@ app.use(rateLimit({
   legacyHeaders: false
 }));
 
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 app.use('/api', routes);
 app.use(notFoundHandler);
 app.use(errorHandler);
